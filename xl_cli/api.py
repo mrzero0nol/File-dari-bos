@@ -5,6 +5,32 @@ from rich.console import Console
 
 console = Console()
 
+def request_otp(config: dict, phone_number: str) -> bool:
+    """Menghubungi server lokal untuk meminta OTP."""
+    payload = {"phone_number": phone_number}
+    try:
+        response = requests.post(config["api_config"]["otp_request_url"], json=payload, timeout=10)
+        response.raise_for_status()
+        return response.json().get("status") == "success"
+    except requests.exceptions.RequestException as e:
+        console.print(f"[bold red]Error:[/bold red] Gagal meminta OTP: {e}")
+        return False
+
+def validate_otp_and_get_token(config: dict, phone_number: str, otp_code: str) -> str | None:
+    """Menghubungi server lokal untuk memvalidasi OTP dan mendapatkan token."""
+    payload = {"phone_number": phone_number, "otp_code": otp_code}
+    try:
+        response = requests.post(config["api_config"]["otp_validate_url"], json=payload, timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            return data.get("access_token")
+        else:
+            console.print(f"[bold red]Error:[/bold red] {response.json().get('message', 'OTP tidak valid.')}")
+            return None
+    except requests.exceptions.RequestException as e:
+        console.print(f"[bold red]Error:[/bold red] Gagal memvalidasi OTP: {e}")
+        return None
+
 def get_signature(config: dict, package_code: str, payment_token: str) -> str | None:
     """Menghubungi server lokal untuk mendapatkan signature."""
 

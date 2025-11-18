@@ -369,6 +369,49 @@ def ax_sign():
             'message': f'AX signing failed: {str(e)}'
         }), 500
 
+@app.route('/request_otp', methods=['POST'])
+def request_otp():
+    """Endpoint untuk mensimulasikan permintaan OTP."""
+    data = request.get_json()
+    phone_number = data.get('phone_number')
+
+    if not phone_number:
+        return jsonify({'status': 'error', 'message': 'Nomor telepon diperlukan'}), 400
+
+    # Di dunia nyata, di sini Anda akan mengirim OTP.
+    # Di sini kita hanya mensimulasikan keberhasilan.
+    print(f"OTP diminta untuk nomor: {phone_number}. OTP simulasi adalah '123456'.")
+    return jsonify({
+        'status': 'success',
+        'message': f'OTP telah dikirim ke {phone_number}'
+    })
+
+@app.route('/validate_otp', methods=['POST'])
+def validate_otp():
+    """Endpoint untuk mensimulasikan validasi OTP dan mengembalikan token."""
+    data = request.get_json()
+    phone_number = data.get('phone_number')
+    otp_code = data.get('otp_code')
+
+    if not phone_number or not otp_code:
+        return jsonify({'status': 'error', 'message': 'Nomor telepon dan kode OTP diperlukan'}), 400
+
+    # OTP yang benar di-hardcode untuk simulasi
+    CORRECT_OTP = "123456"
+
+    if otp_code == CORRECT_OTP:
+        # Buat token akses palsu
+        dummy_token = f"dummy_token_for_{phone_number}_{uuid.uuid4()}"
+        print(f"OTP benar untuk {phone_number}. Token dibuat: {dummy_token}")
+        return jsonify({
+            'status': 'success',
+            'access_token': dummy_token,
+            'message': 'Login berhasil'
+        })
+    else:
+        print(f"OTP salah untuk {phone_number}. Diterima: {otp_code}")
+        return jsonify({'status': 'error', 'message': 'Kode OTP salah'}), 401
+
 @app.route('/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
