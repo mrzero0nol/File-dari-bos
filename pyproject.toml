@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xl-cli"
+version = "1.0.0"
+authors = [
+  { name="Your Name", email="you@example.com" },
+]
+description = "A CLI for interacting with the XL API."
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "requests",
+    "typer",
+    "rich",
+]
+
+[project.scripts]
+xl-cli = "xl_cli.main:app"
