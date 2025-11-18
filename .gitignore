@@ -1,0 +1,15 @@
+# Python build artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+*.whl
+
+# Log files
+*.log
+
+# Environment variables
+.env

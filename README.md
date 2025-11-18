@@ -1,56 +1,64 @@
-# Skrip Pembelian Paket XL (Versi Ramah Pengguna)
+# XL-CLI: Aplikasi Baris Perintah untuk API XL
 
-Repositori ini menyediakan seperangkat alat untuk mengotomatiskan pembelian paket XL, termasuk yang menggunakan *family code*. Prosesnya telah disederhanakan agar mudah digunakan.
+`xl-cli` adalah aplikasi baris perintah (*command-line*) yang modern dan ramah pengguna untuk berinteraksi dengan API XL. Alat ini memungkinkan Anda mengelola konfigurasi akun dan membeli paket data langsung dari terminal Anda.
+
+Proyek ini meniru gaya aplikasi CLI profesional seperti `gh` atau `doctl` untuk pengalaman pengguna yang intuitif.
 
 ## Fitur
-- **Pengaturan Satu Kali**: Simpan detail akun Anda (token, kode keluarga) sekali saja dalam file `config.json`.
-- **Skrip Terpadu**: Satu perintah sederhana (`purchase.py`) untuk menangani seluruh proses pembelian.
-- **Otomatisasi Penuh**: Skrip secara otomatis mendapatkan *signature* keamanan dan mengirim permintaan pembelian.
+
+- **Instalasi Mudah**: Cukup instal sekali, dan perintah `xl-cli` akan tersedia di seluruh sistem Anda.
+- **Manajemen Konfigurasi Aman**: Simpan kredensial Anda (token akses, kode keluarga) dengan aman menggunakan perintah `config`. Tidak perlu lagi mengedit file JSON secara manual.
+- **Perintah Intuitif**: Beli paket dengan perintah sederhana seperti `xl-cli purchase [KODE_PAKET]`.
+- **Umpan Balik Interaktif**: Dilengkapi dengan *progress bar* dan output yang diformat dengan baik untuk kejelasan.
 
 ---
 
-## Cara Penggunaan (3 Langkah Mudah)
+## Cara Penggunaan
 
-### Langkah 1: Instalasi Dependensi
+### Langkah 1: Instalasi
 
-Pastikan Anda memiliki semua *library* Python yang dibutuhkan. Buka terminal dan jalankan:
-```bash
-pip install Flask pycryptodome requests
-```
+1.  **Prasyarat**: Pastikan Anda memiliki Python 3.7+ dan `pip` terinstal.
+2.  **Kloning Repositori**: Jika Anda belum melakukannya, kloning repositori ini ke mesin lokal Anda.
+3.  **Instalasi**: Navigasi ke direktori root proyek dan jalankan perintah berikut. Tanda `.` mengacu pada direktori saat ini.
+    ```bash
+    pip install .
+    ```
+    Perintah ini akan menginstal `xl-cli` dan semua dependensinya. Sekarang perintah `xl-cli` akan tersedia secara global di terminal Anda.
 
 ### Langkah 2: Konfigurasi Akun Anda
 
-1.  Salin file `config.template.json` menjadi file baru bernama `config.json`.
-    ```bash
-    cp config.template.json config.json
-    ```
-2.  Buka `config.json` dengan editor teks.
-3.  Isi `access_token` dan `family_code` dengan data asli dari akun XL Anda. Simpan file tersebut.
+Sebelum dapat membeli paket, Anda perlu menyimpan kredensial Anda. Cukup jalankan perintah ini sekali:
+```bash
+xl-cli config set --token "TOKEN_AKSES_VALID_ANDA" --family "KODE_FAMILY_ANDA"
+```
+-   Opsi `--family` bersifat opsional.
+-   Kredensial Anda akan disimpan dengan aman di direktori konfigurasi sistem Anda (misalnya, `~/.config/xl-cli/`).
 
 ### Langkah 3: Beli Paket
 
-1.  **Jalankan Server Lokal**: Di **Terminal 1**, jalankan server keamanan. Cukup jalankan sekali dan biarkan tetap berjalan di latar belakang.
+1.  **Jalankan Server Lokal**: Aplikasi ini memerlukan `server.py` untuk berjalan di latar belakang guna menangani pembuatan *signature* kriptografi. Buka **Terminal 1** dan jalankan:
     ```bash
     python server.py
     ```
-2.  **Jalankan Skrip Pembelian**: Di **Terminal 2**, jalankan skrip `purchase.py` diikuti dengan kode paket yang ingin Anda beli.
+    Biarkan terminal ini tetap berjalan.
+
+2.  **Beli Paket**: Sekarang, di **Terminal 2**, Anda dapat membeli paket kapan saja dengan perintah `purchase` yang sederhana:
 
     **Format Perintah:**
     ```bash
-    python purchase.py [KODE_PAKET]
+    xl-cli purchase [KODE_PAKET]
     ```
 
     **Contoh Praktis:**
     ```bash
-    python purchase.py "internet_super_50gb"
+    xl-cli purchase "internet_super_50gb"
     ```
-3.  **Selesai!**: Skrip akan secara otomatis melakukan proses dua langkah (mendapatkan *signature* dan mengirim permintaan pembelian) dan akan menampilkan hasil akhirnya, baik itu sukses atau gagal.
+3.  **Selesai!**: `xl-cli` akan menampilkan *progress bar* saat bekerja dan akan mencetak hasil akhir transaksi langsung di terminal Anda.
 
 ---
 
-### Komponen Sistem
+### Daftar Perintah
 
-- **`purchase.py`**: Skrip utama yang Anda gunakan untuk membeli paket.
-- **`config.json`**: File tempat Anda menyimpan pengaturan pribadi Anda. (File ini tidak akan diunggah ke Git).
-- **`server.py`**: Server lokal yang berjalan di latar belakang untuk membuat *signature* keamanan.
-- **`decrypted_pycode.py`**: Modul internal yang digunakan untuk keperluan kompatibilitas.
+-   `xl-cli config set --token "..." --family "..."`: Menyimpan kredensial Anda.
+-   `xl-cli config path`: Menampilkan lokasi file konfigurasi Anda.
+-   `xl-cli purchase [KODE_PAKET]`: Membeli paket data.
