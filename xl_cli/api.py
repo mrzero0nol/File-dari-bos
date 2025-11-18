@@ -33,11 +33,17 @@ def ts_gmt7_without_colon(dt: datetime) -> str:
 def get_common_headers(config: dict) -> dict:
     now = datetime.now(timezone(timedelta(hours=7)))
     return {
+        "Accept-Encoding": "gzip, deflate, br",
         "Authorization": f"Basic {BASIC_AUTH}",
         "Ax-Device-Id": AX_DEVICE_ID,
         "Ax-Fingerprint": AX_FP,
         "Ax-Request-At": java_like_timestamp(now),
+        "Ax-Request-Device": "samsung",
+        "Ax-Request-Device-Model": "SM-N935F",
         "Ax-Request-Id": str(uuid.uuid4()),
+        "Ax-Substype": "PREPAID",
+        "Content-Type": "application/json",
+        "Host": config["api_config"]["base_ciam_url"].replace("https://", ""),
         "User-Agent": UA,
     }
 
