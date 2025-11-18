@@ -13,11 +13,12 @@ DEFAULT_CONFIG = {
         "family_code": None
     },
     "api_config": {
+        "base_ciam_url": "https://gede.ciam.xlaxiata.co.id",
+        "otp_request_path": "/realms/xl-ciam/auth/otp",
+        "otp_validate_path": "/realms/xl-ciam/protocol/openid-connect/token",
         "signature_server_url": "http://localhost:5000/paysign",
         "xl_purchase_url": "https://api.myxl.xlaxiata.co.id/api/v2/purchase",
-        "api_key": "vT8tINqHaOxXbGE7eOWAhA==",
-        "otp_request_url": "http://localhost:5000/request_otp",
-        "otp_validate_url": "http://localhost:5000/validate_otp"
+        "api_key": "vT8tINqHaOxXbGE7eOWAhA=="
     }
 }
 
