@@ -2,8 +2,12 @@ import typer
 from typing_extensions import Annotated
 from rich.console import Console
 import json
+import time
+from rich.progress import Progress
+from rich.json import JSON
 
-from . import config as cfg_manager # Mengganti nama import untuk kejelasan
+from . import config as cfg_manager
+from . import api
 
 # Aplikasi utama
 app = typer.Typer(
@@ -11,45 +15,72 @@ app = typer.Typer(
     help="CLI untuk berinteraksi dengan API XL."
 )
 
+console = Console()
+
+@app.command()
+def login():
+    """
+    Memulai sesi login interaktif untuk mendapatkan token akses.
+    """
+    console.print("--- [bold]Login Interaktif XL-CLI[/bold] ---")
+    phone_number = typer.prompt("Masukkan nomor telepon Anda (cth: 08123456789)")
+
+    cfg = cfg_manager.load_config()
+
+    # Langkah 1: Minta OTP
+    console.print(f"Mengirim permintaan OTP ke {phone_number}...")
+    if not api.request_otp(cfg, phone_number):
+        raise typer.Exit(code=1)
+
+    console.print("[bold green]✓ Permintaan OTP berhasil.[/bold green] (Dalam simulasi, OTP adalah '123456')")
+
+    # Langkah 2: Validasi OTP
+    otp_code = typer.prompt("Masukkan kode OTP yang Anda terima")
+
+    console.print("Memvalidasi kode OTP...")
+    token = api.validate_otp_and_get_token(cfg, phone_number, otp_code)
+
+    if not token:
+        console.print("[bold red]Login gagal.[/bold red]")
+        raise typer.Exit(code=1)
+
+    # Langkah 3: Simpan Token
+    cfg["user_details"]["access_token"] = token
+    cfg_manager.save_config(cfg)
+
+    console.print("\n[bold green]✅ Login berhasil! Token akses Anda telah disimpan dengan aman.[/bold green]")
+    console.print("Anda sekarang siap untuk menggunakan perintah `purchase`.")
+
 # Aplikasi sekunder untuk sub-perintah 'config'
 config_app = typer.Typer(
     name="config",
-    help="Mengatur atau melihat konfigurasi."
+    help="Mengatur atau melihat konfigurasi sekunder."
 )
 app.add_typer(config_app)
-
-console = Console()
 
 @config_app.callback()
 def config_callback(ctx: typer.Context):
     """Callback untuk perintah config."""
-    # Jika tidak ada sub-perintah yang dipanggil, tampilkan bantuan
     if ctx.invoked_subcommand is None:
         console.print("[bold yellow]Peringatan:[/bold yellow] Perintah 'config' memerlukan sub-perintah.")
-        console.print("Gunakan `xl-cli config set --help` untuk mengatur kredensial.")
+        console.print("Gunakan `xl-cli config set --help` untuk mengatur kode family.")
         console.print("Gunakan `xl-cli config path` untuk melihat lokasi file konfigurasi.")
 
 @config_app.command("set")
 def config_set(
-    token: Annotated[str, typer.Option("--token", help="Access token akun XL Anda.")] = None,
-    family: Annotated[str, typer.Option("--family", help="Kode family Anda (opsional).")] = None,
+    family: Annotated[str, typer.Option("--family", help="Kode family Anda (opsional). Format: UUID")] = None,
 ):
     """
-    Mengatur kredensial seperti token akses dan kode family.
+    Mengatur konfigurasi sekunder seperti kode family.
     """
-    if token is None and family is None:
-        console.print("[bold yellow]Peringatan:[/bold yellow] Tidak ada yang diatur. Harap gunakan opsi `--token` atau `--family`.")
+    if family is None:
+        console.print("[bold yellow]Peringatan:[/bold yellow] Tidak ada yang diatur. Harap gunakan opsi `--family`.")
         raise typer.Exit(code=1)
 
     current_config = cfg_manager.load_config()
 
-    if token:
-        current_config["user_details"]["access_token"] = token
-        console.print("✅ Token akses berhasil disimpan.")
-
-    if family:
-        current_config["user_details"]["family_code"] = family
-        console.print("✅ Kode family berhasil disimpan.")
+    current_config["user_details"]["family_code"] = family
+    console.print("✅ Kode family berhasil disimpan.")
 
     cfg_manager.save_config(current_config)
     console.print("\n[bold green]Konfigurasi berhasil diperbarui![/bold green]")
@@ -62,11 +93,6 @@ def config_path():
     cfg_path = cfg_manager.get_config_path()
     console.print(f"{cfg_path}")
 
-from . import api
-import time
-from rich.progress import Progress
-from rich.json import JSON
-
 @app.command()
 def purchase(
     package_code: Annotated[str, typer.Argument(help="Kode paket yang ingin dibeli.")],
@@ -78,7 +104,7 @@ def purchase(
     cfg = cfg_manager.load_config()
     if not cfg["user_details"]["access_token"]:
         console.print("[bold red]Error:[/bold red] Token akses belum diatur.")
-        console.print("Silakan jalankan `xl-cli config set --token \"...\"` terlebih dahulu.")
+        console.print("Silakan jalankan `xl-cli login` terlebih dahulu.")
         raise typer.Exit(code=1)
 
     # Buat token pembayaran unik untuk transaksi ini
