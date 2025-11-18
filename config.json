@@ -1,0 +1,16 @@
+{
+  "user_details": {
+    "access_token": "dummy_access_token_12345",
+    "family_code": "FAM_DUMMY_987"
+  },
+  "transaction_defaults": {
+    "payment_method": "pulsa",
+    "payment_for": "Pembelian Paket via Skrip",
+    "api_path": "/api/v2/purchase"
+  },
+  "api_config": {
+    "signature_server_url": "http://localhost:5000/paysign",
+    "xl_purchase_url": "https://api.myxl.xlaxiata.co.id/api/v2/purchase",
+    "api_key": "vT8tINqHaOxXbGE7eOWAhA=="
+  }
+}

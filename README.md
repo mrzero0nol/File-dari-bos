@@ -1,130 +1,56 @@
-# Analisis Kode: Klien & Server Kriptografi
+# Skrip Pembelian Paket XL (Versi Ramah Pengguna)
 
-Repositori ini berisi dua skrip Python yang bekerja sama untuk mengelola komunikasi aman (terenkripsi): `server.py` dan `decrypted_pycode.py`.
+Repositori ini menyediakan seperangkat alat untuk mengotomatiskan pembelian paket XL, termasuk yang menggunakan *family code*. Prosesnya telah disederhanakan agar mudah digunakan.
 
----
-
-## 1. `server.py` (Bertindak sebagai Server)
-
-File ini adalah server web yang dibuat menggunakan **Flask**. Fungsi utamanya adalah menyediakan layanan kriptografi melalui API.
-
-### Fungsi Utama:
-- **Penyedia Layanan Kriptografi**: Menyediakan _endpoints_ untuk enkripsi (menggunakan **AES-256-CBC**) dan pembuatan tanda tangan digital (menggunakan **HMAC-SHA512**).
-- **Simulasi Backend**: Bertindak sebagai backend yang mensimulasikan proses keamanan yang dibutuhkan oleh sebuah aplikasi, seperti validasi API key dan pengamanan _request body_.
-
-### Cara Kerja:
-1.  **Menjalankan Server**: Saat dieksekusi, `server.py` memulai sebuah server web yang siap menerima permintaan HTTP di port 5000.
-2.  **Menyediakan Endpoints**: Memiliki beberapa URL yang bisa diakses:
-    - `/xdataenc`: Untuk mengenkripsi data.
-    - `/xdatadec`: Untuk mendekripsi data.
-    - `/paysign`, `/bountysign`, dll: Untuk membuat _signature_ (tanda tangan) untuk berbagai jenis transaksi.
-3.  **Memproses Permintaan**: Ketika sebuah permintaan masuk, server akan memvalidasi `x-api-key`, melakukan operasi kriptografi yang diminta menggunakan kunci rahasia internal, dan mengembalikan hasilnya dalam format JSON.
-
-**Analogi**: Anggap `server.py` sebagai **brankas digital**. Anda memberikannya data, ia akan menguncinya (enkripsi) dan memberinya stempel pengaman (_signature_) sebelum mengembalikannya.
+## Fitur
+- **Pengaturan Satu Kali**: Simpan detail akun Anda (token, kode keluarga) sekali saja dalam file `config.json`.
+- **Skrip Terpadu**: Satu perintah sederhana (`purchase.py`) untuk menangani seluruh proses pembelian.
+- **Otomatisasi Penuh**: Skrip secara otomatis mendapatkan *signature* keamanan dan mengirim permintaan pembelian.
 
 ---
 
-## 2. `decrypted_pycode.py` (Bertindak sebagai Modul Konfigurasi Klien)
-
-File ini **bukan untuk dijalankan langsung**. Ini adalah sebuah modul konfigurasi yang diimpor oleh skrip lain (klien) untuk membantunya berkomunikasi dengan server.
-
-### Fungsi Utama:
-- **Menyimpan Kredensial**: Berisi semua konfigurasi penting seperti URL API, kunci, dan token yang dibutuhkan untuk otentikasi.
-- **Menyuntikkan Header Otomatis**: Secara otomatis menambahkan _header_ HTTP khusus (`y-sig-key: onodera91`) ke setiap permintaan yang dikirim ke domain yang telah ditentukan (`crypto.mashul.ol`, `me.mashul.ol`).
-
-### Cara Kerja (Monkey Patching):
-1.  **Di-import oleh Klien**: Sebuah skrip klien akan memulai dengan `import decrypted_pycode`.
-2.  **Mengatur Konfigurasi**: Seketika itu juga, semua kunci dan kredensial dimuat sebagai _environment variable_ agar mudah diakses.
-3.  **Memodifikasi Library HTTP**: Bagian terpenting dari file ini adalah kemampuannya untuk memodifikasi _library_ `requests` dan `httpx` saat _runtime_. Ia "mencegat" setiap permintaan yang akan dikirim.
-4.  **Menambahkan Header**: Sebelum permintaan dikirim, ia memeriksa tujuannya. Jika tujuannya adalah salah satu host yang diizinkan, ia akan **secara otomatis menambahkan _header_ `y-sig-key`**.
-5.  **Melanjutkan Permintaan**: Permintaan yang sudah dimodifikasi kemudian diteruskan untuk dikirim.
-
-**Analogi**: Anggap `decrypted_pycode.py` sebagai **asisten pribadi** untuk skrip klien. Setiap kali klien ingin mengirim surat (permintaan HTTP), asisten ini akan secara otomatis menempelkan stiker khusus (_header_) yang diperlukan agar surat itu diterima oleh server.
-
----
-
-### Hubungan Keduanya
-
--   `decrypted_pycode.py` **menyiapkan** permintaan dari sisi klien.
--   `server.py` **menerima dan memproses** permintaan tersebut di sisi server.
-
-Keduanya membentuk sistem sederhana untuk pengembangan dan pengujian alur kerja yang melibatkan komunikasi terenkripsi.
-
----
-
-## Cara Menjalankan Simulasi Klien-Server
-
-Untuk menguji interaksi antara klien dan server, Anda memerlukan dua terminal.
+## Cara Penggunaan (3 Langkah Mudah)
 
 ### Langkah 1: Instalasi Dependensi
 
-Pastikan semua library yang dibutuhkan sudah terpasang:
+Pastikan Anda memiliki semua *library* Python yang dibutuhkan. Buka terminal dan jalankan:
 ```bash
 pip install Flask pycryptodome requests
 ```
 
-### Langkah 2: Jalankan Server
+### Langkah 2: Konfigurasi Akun Anda
 
-Di **Terminal 1**, jalankan `server.py`:
-```bash
-python server.py
-```
-Server sekarang akan berjalan dan menunggu permintaan di `http://localhost:5000`.
+1.  Salin file `config.template.json` menjadi file baru bernama `config.json`.
+    ```bash
+    cp config.template.json config.json
+    ```
+2.  Buka `config.json` dengan editor teks.
+3.  Isi `access_token` dan `family_code` dengan data asli dari akun XL Anda. Simpan file tersebut.
 
-### Langkah 3: Jalankan Klien
+### Langkah 3: Beli Paket
 
-Di **Terminal 2**, jalankan `client.py` dengan argumen yang dibutuhkan untuk simulasi pembelian.
-
-**Format Perintah:**
-```bash
-python client.py [access_token] [package_code] [token_payment] [payment_method] [payment_for] [path] --family_code [kode_keluarga]
-```
-
-**Contoh Praktis:**
-```bash
-python client.py "tok_12345" "internet_super_20gb" "pay_abcde" "pulsa" "pembelian_paket_bulanan" "/api/v2/purchase" --family_code "FAM987"
-```
-
-### Langkah 4: Lihat Hasil
-
-- **Terminal Klien** akan menampilkan data yang dikirim dan `x_signature` yang diterima dari server.
-- **Terminal Server** akan menampilkan log permintaan HTTP yang masuk dari klien.
-
----
-
-## Alur Kerja Pembelian Paket (2 Langkah)
-
-Proses untuk membeli paket (terutama menggunakan _family code_) melibatkan dua langkah utama:
-
-### Langkah 1: Mendapatkan Tanda Tangan Digital (`x-signature`)
-Pertama, kita perlu mendapatkan _signature_ yang valid dari server kriptografi. _Signature_ ini membuktikan bahwa permintaan kita sah.
-
-1.  **Jalankan Server**: Di **Terminal 1**, jalankan `server.py`:
+1.  **Jalankan Server Lokal**: Di **Terminal 1**, jalankan server keamanan. Cukup jalankan sekali dan biarkan tetap berjalan di latar belakang.
     ```bash
     python server.py
     ```
-2.  **Jalankan Klien**: Di **Terminal 2**, jalankan `client.py` dengan detail paket yang ingin Anda beli.
-    ```bash
-    python client.py "tok_123" "internet_super_50gb" "pay_token_xyz" "pulsa" "pembelian_bulanan" "/api/v2/purchase" --family_code "FAM123"
-    ```
-3.  **Simpan Signature**: Salin nilai `x_signature` yang panjang dari output klien. Anda akan membutuhkannya di langkah berikutnya.
-    ```
-    <<< Respons dari server:
-    ✅ Signature berhasil dibuat: [SIGNATURE_PANJANG_DARI_SINI]
-    ```
-
-### Langkah 2: Mengeksekusi Pembelian
-Sekarang, gunakan _signature_ yang sudah Anda dapatkan untuk mengirim permintaan pembelian yang sebenarnya ke API XL.
-
-1.  **Jalankan Skrip Pembelian**: Di **Terminal 2**, jalankan `buy_package.py`. Gunakan _signature_ yang Anda salin sebagai argumen pertama, diikuti oleh detail paket yang **sama persis** dengan yang Anda gunakan di Langkah 1.
+2.  **Jalankan Skrip Pembelian**: Di **Terminal 2**, jalankan skrip `purchase.py` diikuti dengan kode paket yang ingin Anda beli.
 
     **Format Perintah:**
     ```bash
-    python buy_package.py [SIGNATURE] [access_token] [package_code] [token_payment] [payment_method] [payment_for] --family_code [kode_keluarga]
+    python purchase.py [KODE_PAKET]
     ```
 
     **Contoh Praktis:**
     ```bash
-    python buy_package.py "[SIGNATURE_PANJANG_DARI_SINI]" "tok_123" "internet_super_50gb" "pay_token_xyz" "pulsa" "pembelian_bulanan" --family_code "FAM123"
+    python purchase.py "internet_super_50gb"
     ```
-2.  **Lihat Hasil**: Skrip ini akan menampilkan _header_ dan _body_ yang akan dikirim ke server XL. Secara default, skrip ini hanya melakukan simulasi. Untuk mengirim permintaan nyata, Anda perlu mengedit file `buy_package.py` dan menghapus komentar pada baris `response = requests.post(...)`.
+3.  **Selesai!**: Skrip akan secara otomatis melakukan proses dua langkah (mendapatkan *signature* dan mengirim permintaan pembelian) dan akan menampilkan hasil akhirnya, baik itu sukses atau gagal.
+
+---
+
+### Komponen Sistem
+
+- **`purchase.py`**: Skrip utama yang Anda gunakan untuk membeli paket.
+- **`config.json`**: File tempat Anda menyimpan pengaturan pribadi Anda. (File ini tidak akan diunggah ke Git).
+- **`server.py`**: Server lokal yang berjalan di latar belakang untuk membuat *signature* keamanan.
+- **`decrypted_pycode.py`**: Modul internal yang digunakan untuk keperluan kompatibilitas.
