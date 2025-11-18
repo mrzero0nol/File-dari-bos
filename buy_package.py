@@ -56,29 +56,28 @@ def execute_purchase(args):
     print("... (Ini adalah simulasi, tidak ada permintaan nyata yang dikirim oleh skrip ini) ...")
 
     try:
-        # Hapus komentar di bawah ini untuk mengirim permintaan nyata
-        # response = requests.post(API_PURCHASE_URL, headers=headers, json=payload, timeout=15)
-        # response.raise_for_status() # Error jika status code bukan 2xx
+        # Baris di bawah ini sekarang AKTIF dan akan mengirim permintaan nyata.
+        response = requests.post(API_PURCHASE_URL, headers=headers, json=payload, timeout=15)
+        response.raise_for_status() # Akan error jika status code bukan 200-299
 
-        # --- Mulai blok simulasi ---
-        # Kode di bawah ini hanya untuk demonstrasi. Ganti dengan `requests.post` di atas.
-        print("\n<<< [SIMULASI] Server merespons dengan sukses (HTTP 200).")
-        simulated_response = {
-            "status": "SUCCESS",
-            "transactionId": "TRX123456789",
-            "message": f"Pembelian paket {args.package_code} berhasil diproses."
-        }
-        print(json.dumps(simulated_response, indent=2))
-        # --- Akhir blok simulasi ---
-
-        # response_data = response.json()
-        # print("\n<<< Respons dari server XL:")
-        # print(json.dumps(response_data, indent=2))
+        # Jika permintaan berhasil, cetak respons dari server
+        response_data = response.json()
+        print("\n<<< Respons dari server XL:")
+        print(json.dumps(response_data, indent=2))
 
     except requests.exceptions.RequestException as e:
         print(f"\n❌ Terjadi error saat melakukan permintaan ke API XL: {e}")
-        # if 'response' in locals():
-        #     print(f"   Response Body: {e.response.text}")
+        # Jika ada respons error dari server, coba cetak isinya untuk debugging
+        if e.response is not None:
+            print(f"   Kode Status Error: {e.response.status_code}")
+            try:
+                # Coba parsing error sebagai JSON
+                error_body = e.response.json()
+                print("   Body Respons Error (JSON):")
+                print(json.dumps(error_body, indent=2))
+            except json.JSONDecodeError:
+                # Jika bukan JSON, cetak sebagai teks biasa
+                print(f"   Body Respons Error (Teks): {e.response.text}")
 
 
 def main():
