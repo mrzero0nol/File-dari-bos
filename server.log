@@ -1,0 +1,12 @@
+XL Crypto Server starting...
+API Key: vT8tINqHaOxXbGE7eOWAhA==
+Endpoints available:
+  POST /xdataenc     - Encrypt and sign data
+  POST /xdatadec     - Decrypt data
+  POST /paysign      - Payment signing
+  POST /bountysign   - Bounty signing
+  POST /rolaysign    - Loyalty signing
+  POST /ax_sign      - AX signing
+  GET  /health       - Health check
+ * Serving Flask app 'server'
+ * Debug mode: on

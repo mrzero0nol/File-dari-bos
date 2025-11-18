@@ -49,3 +49,43 @@ File ini **bukan untuk dijalankan langsung**. Ini adalah sebuah modul konfiguras
 -   `server.py` **menerima dan memproses** permintaan tersebut di sisi server.
 
 Keduanya membentuk sistem sederhana untuk pengembangan dan pengujian alur kerja yang melibatkan komunikasi terenkripsi.
+
+---
+
+## Cara Menjalankan Simulasi Klien-Server
+
+Untuk menguji interaksi antara klien dan server, Anda memerlukan dua terminal.
+
+### Langkah 1: Instalasi Dependensi
+
+Pastikan semua library yang dibutuhkan sudah terpasang:
+```bash
+pip install Flask pycryptodome requests
+```
+
+### Langkah 2: Jalankan Server
+
+Di **Terminal 1**, jalankan `server.py`:
+```bash
+python server.py
+```
+Server sekarang akan berjalan dan menunggu permintaan di `http://localhost:5000`.
+
+### Langkah 3: Jalankan Klien
+
+Di **Terminal 2**, jalankan `client.py` dengan argumen yang dibutuhkan untuk simulasi pembelian.
+
+**Format Perintah:**
+```bash
+python client.py [access_token] [package_code] [token_payment] [payment_method] [payment_for] [path] --family_code [kode_keluarga]
+```
+
+**Contoh Praktis:**
+```bash
+python client.py "tok_12345" "internet_super_20gb" "pay_abcde" "pulsa" "pembelian_paket_bulanan" "/api/v2/purchase" --family_code "FAM987"
+```
+
+### Langkah 4: Lihat Hasil
+
+- **Terminal Klien** akan menampilkan data yang dikirim dan `x_signature` yang diterima dari server.
+- **Terminal Server** akan menampilkan log permintaan HTTP yang masuk dari klien.
