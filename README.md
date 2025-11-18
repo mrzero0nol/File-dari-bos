@@ -89,3 +89,42 @@ python client.py "tok_12345" "internet_super_20gb" "pay_abcde" "pulsa" "pembelia
 
 - **Terminal Klien** akan menampilkan data yang dikirim dan `x_signature` yang diterima dari server.
 - **Terminal Server** akan menampilkan log permintaan HTTP yang masuk dari klien.
+
+---
+
+## Alur Kerja Pembelian Paket (2 Langkah)
+
+Proses untuk membeli paket (terutama menggunakan _family code_) melibatkan dua langkah utama:
+
+### Langkah 1: Mendapatkan Tanda Tangan Digital (`x-signature`)
+Pertama, kita perlu mendapatkan _signature_ yang valid dari server kriptografi. _Signature_ ini membuktikan bahwa permintaan kita sah.
+
+1.  **Jalankan Server**: Di **Terminal 1**, jalankan `server.py`:
+    ```bash
+    python server.py
+    ```
+2.  **Jalankan Klien**: Di **Terminal 2**, jalankan `client.py` dengan detail paket yang ingin Anda beli.
+    ```bash
+    python client.py "tok_123" "internet_super_50gb" "pay_token_xyz" "pulsa" "pembelian_bulanan" "/api/v2/purchase" --family_code "FAM123"
+    ```
+3.  **Simpan Signature**: Salin nilai `x_signature` yang panjang dari output klien. Anda akan membutuhkannya di langkah berikutnya.
+    ```
+    <<< Respons dari server:
+    ✅ Signature berhasil dibuat: [SIGNATURE_PANJANG_DARI_SINI]
+    ```
+
+### Langkah 2: Mengeksekusi Pembelian
+Sekarang, gunakan _signature_ yang sudah Anda dapatkan untuk mengirim permintaan pembelian yang sebenarnya ke API XL.
+
+1.  **Jalankan Skrip Pembelian**: Di **Terminal 2**, jalankan `buy_package.py`. Gunakan _signature_ yang Anda salin sebagai argumen pertama, diikuti oleh detail paket yang **sama persis** dengan yang Anda gunakan di Langkah 1.
+
+    **Format Perintah:**
+    ```bash
+    python buy_package.py [SIGNATURE] [access_token] [package_code] [token_payment] [payment_method] [payment_for] --family_code [kode_keluarga]
+    ```
+
+    **Contoh Praktis:**
+    ```bash
+    python buy_package.py "[SIGNATURE_PANJANG_DARI_SINI]" "tok_123" "internet_super_50gb" "pay_token_xyz" "pulsa" "pembelian_bulanan" --family_code "FAM123"
+    ```
+2.  **Lihat Hasil**: Skrip ini akan menampilkan _header_ dan _body_ yang akan dikirim ke server XL. Secara default, skrip ini hanya melakukan simulasi. Untuk mengirim permintaan nyata, Anda perlu mengedit file `buy_package.py` dan menghapus komentar pada baris `response = requests.post(...)`.
