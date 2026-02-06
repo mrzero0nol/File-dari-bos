@@ -1,9 +1,10 @@
 # 🚀 SawargiPay H2H API Documentation
 
-Dokumentasi resmi untuk integrasi Host-to-Host (H2H) transaksi pulsa dan paket data menggunakan API SawargiPay.
+Dokumentasi resmi untuk integrasi Host-to-Host (H2H) transaksi pulsa dan paket data.
 
 > [!IMPORTANT]
-> **Base URL:** `https://api.sawargipay.com`  
+> **Base URL:** `https://api.sawargipay.com`
+>
 > **Content-Type:** `application/json`
 
 ## 🔐 Autentikasi
@@ -24,17 +25,15 @@ Setiap request ke API harus menyertakan **API Key** di dalam Header.
 ### 1. 💰 Cek Saldo
 Mendapatkan informasi sisa saldo akun Anda.
 
-- **Endpoint:** `POST /h2h_activity/v1/saldo`
+- **Method:** `POST`
+- **Endpoint:** `/h2h_activity/v1/saldo`
 
-<details>
-<summary><b>🔎 Lihat Contoh Request & Response</b></summary>
-
-**cURL Request:**
+**Contoh Request (cURL):**
 ```bash
 curl --location --request POST '[https://api.sawargipay.com/h2h_activity/v1/saldo](https://api.sawargipay.com/h2h_activity/v1/saldo)' \
 --header 'Api-Key: YOUR_API_KEY'
 
-Response Success (200):
+Response Success:
 {
   "status": true,
   "message": "Saldo berhasil diambil",
@@ -44,17 +43,16 @@ Response Success (200):
   }
 }
 
-</details>
 2. 📦 Daftar Produk
 Mengambil daftar produk tersedia berdasarkan kategori dan operator.
- * Endpoint: POST /h2h_activity/v1/produk
-| Parameter Body | Tipe | Wajib | Contoh |
+ * Method: POST
+ * Endpoint: /h2h_activity/v1/produk
+Parameter Body:
+| Parameter | Tipe | Wajib | Contoh |
 |---|---|---|---|
 | kategori | string | Ya | "PULSA", "PAKET_DATA" |
 | operator | string | Tidak | "Telkomsel", "XL" |
-<details>
-<summary><b>🔎 Lihat Contoh Request & Response</b></summary>
-cURL Request:
+Contoh Request:
 curl --location '[https://api.sawargipay.com/h2h_activity/v1/produk](https://api.sawargipay.com/h2h_activity/v1/produk)' \
 --header 'Api-Key: YOUR_API_KEY' \
 --header 'Content-Type: application/json' \
@@ -63,7 +61,7 @@ curl --location '[https://api.sawargipay.com/h2h_activity/v1/produk](https://api
     "operator": "Telkomsel"
 }'
 
-Response Success (200):
+Response Success:
 {
   "status": true,
   "message": "Produk berhasil diambil",
@@ -81,18 +79,17 @@ Response Success (200):
   ]
 }
 
-</details>
 3. ⚡ Transaksi (Top Up)
 Melakukan pembelian pulsa atau paket data.
- * Endpoint: POST /h2h_activity/v1/transaksi
-| Parameter Body | Tipe | Wajib | Deskripsi |
+ * Method: POST
+ * Endpoint: /h2h_activity/v1/transaksi
+Parameter Body:
+| Parameter | Tipe | Wajib | Deskripsi |
 |---|---|---|---|
 | kategori | string | Ya | "PULSA" atau "PAKET_DATA" |
-| produk_kode | string | Ya | Kode produk dari endpoint Produk (misal: TSEL5) |
+| produk_kode | string | Ya | Kode produk (misal: TSEL5) |
 | tujuan | string | Ya | Nomor HP pelanggan (misal: 081234567890) |
-<details>
-<summary><b>🔎 Lihat Contoh Request & Response</b></summary>
-cURL Request:
+Contoh Request:
 curl --location '[https://api.sawargipay.com/h2h_activity/v1/transaksi](https://api.sawargipay.com/h2h_activity/v1/transaksi)' \
 --header 'Api-Key: YOUR_API_KEY' \
 --header 'Content-Type: application/json' \
@@ -102,7 +99,7 @@ curl --location '[https://api.sawargipay.com/h2h_activity/v1/transaksi](https://
     "tujuan": "081234567890"
 }'
 
-Response Success (Langsung Sukses):
+Response Success:
 {
   "status": true,
   "message": "Transaksi berhasil",
@@ -116,26 +113,15 @@ Response Success (Langsung Sukses):
   }
 }
 
-Response Pending (Proses):
-{
-  "status": true,
-  "message": "Transaksi sedang diproses",
-  "data": {
-    "trx_kode": "TRX20240203001",
-    "status": "pending"
-  }
-}
-
-</details>
 4. 🔄 Cek Status Transaksi
 Mengecek status terakhir dari transaksi yang telah dilakukan.
- * Endpoint: POST /h2h_activity/v1/status
-| Parameter Body | Tipe | Wajib | Deskripsi |
+ * Method: POST
+ * Endpoint: /h2h_activity/v1/status
+Parameter Body:
+| Parameter | Tipe | Wajib | Deskripsi |
 |---|---|---|---|
-| trx_kode | string | Ya | ID Transaksi yang didapat saat order (misal: TRX2024...) |
-<details>
-<summary><b>🔎 Lihat Contoh Request & Response</b></summary>
-cURL Request:
+| trx_kode | string | Ya | ID Transaksi (misal: TRX2024...) |
+Contoh Request:
 curl --location '[https://api.sawargipay.com/h2h_activity/v1/status](https://api.sawargipay.com/h2h_activity/v1/status)' \
 --header 'Api-Key: YOUR_API_KEY' \
 --header 'Content-Type: application/json' \
@@ -143,7 +129,7 @@ curl --location '[https://api.sawargipay.com/h2h_activity/v1/status](https://api
     "trx_kode": "TRX20240203001"
 }'
 
-Response Success (200):
+Response Success:
 {
   "status": true,
   "message": "Status transaksi berhasil diambil",
@@ -158,7 +144,6 @@ Response Success (200):
   }
 }
 
-</details>
 🛠 Kode Status & Error
 API menggunakan HTTP Status Code standar dan field status di dalam JSON.
 | Status | HTTP Code | Keterangan |
@@ -169,7 +154,4 @@ API menggunakan HTTP Status Code standar dan field status di dalam JSON.
 | error | 401 | Unauthorized: API Key salah/tidak ada. |
 | error | 400 | Bad Request: Parameter input salah. |
 | error | 500 | Server Error: Kesalahan internal server. |
-<p align="center">
-Built with ❤️ by SawargiPay Tech Team
-</p>
 
