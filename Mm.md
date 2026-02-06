@@ -1,11 +1,3 @@
-Tentu, ini adalah versi yang sudah dipoles khusus untuk GitHub.
-Versi ini memiliki struktur yang lebih profesional dengan penambahan:
- * Badges agar terlihat keren.
- * Table of Contents untuk navigasi cepat.
- * Highlighting pada bagian penting (URL, Auth).
- * Layout Tabel yang lebih rapi.
- * Emoji untuk visualisasi yang lebih menarik tapi tetap profesional.
-Kamu tinggal copy kode raw di bawah ini dan paste ke file README.md di repository GitHub kamu.
 # 💳 SawargiPay H2H API Documentation
 
 ![API Status](https://img.shields.io/badge/API-Active-success?style=flat-square)
