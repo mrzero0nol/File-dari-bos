@@ -1,77 +1,40 @@
-# 💳 SawargiPay H2H API Documentation
+# 🚀 SawargiPay H2H API Documentation
 
-![API Status](https://img.shields.io/badge/API-Active-success?style=flat-square)
-![Version](https://img.shields.io/badge/Version-1.0.0-blue?style=flat-square)
-![Format](https://img.shields.io/badge/Format-JSON-orange?style=flat-square)
+Dokumentasi resmi untuk integrasi Host-to-Host (H2H) transaksi pulsa dan paket data menggunakan API SawargiPay.
 
-Dokumentasi resmi untuk integrasi **Host-to-Host (H2H)** transaksi pulsa, paket data, dan PPOB menggunakan SawargiPay API. Dokumentasi ini mencakup manajemen saldo, pengecekan produk, pembuatan transaksi, dan pengecekan status.
-
----
-
-## 📑 Daftar Isi
-
-- [Konfigurasi Dasar](#-konfigurasi-dasar)
-- [Autentikasi](#-autentikasi)
-- [Response & Error Handling](#-response--error-handling)
-- [Endpoints](#-endpoints)
-  - [1. Cek Saldo](#1-cek-saldo)
-  - [2. Daftar Produk](#2-daftar-produk)
-  - [3. Transaksi](#3-transaksi)
-  - [4. Cek Status](#4-cek-status)
-- [Support](#-support)
-
----
-
-## ⚙️ Konfigurasi Dasar
-
-- **Base URL:**
-
-https://api.sawargipay.com
-- **Content-Type:** `application/json`
-- **Rate Limit:** Saat ini tidak ada *hard limit*, namun harap gunakan secara wajar (*fair usage*) untuk menjaga stabilitas server.
-
----
+> [!IMPORTANT]
+> **Base URL:** `https://api.sawargipay.com`  
+> **Content-Type:** `application/json`
 
 ## 🔐 Autentikasi
 
-Setiap request ke API wajib menyertakan **API Key** di dalam header.
+Setiap request ke API harus menyertakan **API Key** di dalam Header.
 
-| Header Key | Value Format | Deskripsi |
+| Header Key | Value | Deskripsi |
 | :--- | :--- | :--- |
-| `Api-Key` | `String` | API Key rahasia Anda. (Hubungi CS untuk mendapatkan Key) |
+| `Api-Key` | `YOUR_SECRET_API_KEY` | Dapatkan API Key dengan menghubungi CS. |
 
-**Contoh Header:**
-```http
-Api-Key: Minta_Sama_CS
-Content-Type: application/json
+> [!NOTE]
+> **Rate Limiting:** Saat ini tidak ada batasan ketat, namun harap gunakan dengan bijak untuk menjaga stabilitas server.
 
-📡 Response & Error Handling
-Format standar response API (JSON):
-{
-  "status": true, // atau false
-  "message": "Pesan response dari server",
-  "data": { ... } // Objek atau Array data
-}
+---
 
-Kode Status HTTP:
-| Code | Status | Keterangan |
-|---|---|---|
-| 200 | OK | Request berhasil diproses. |
-| 400 | Bad Request | Parameter input salah atau kurang. |
-| 401 | Unauthorized | API Key salah, tidak dikirim, atau akun bermasalah. |
-| 500 | Server Error | Terjadi kesalahan internal pada server. |
-🚀 Endpoints
-1. Cek Saldo
+## 📚 Daftar Endpoint
+
+### 1. 💰 Cek Saldo
 Mendapatkan informasi sisa saldo akun Anda.
- * URL: /h2h_activity/v1/saldo
- * Method: POST
+
+- **Endpoint:** `POST /h2h_activity/v1/saldo`
+
 <details>
-<summary><b>Lihat Contoh Request & Response</b></summary>
-cURL Request:
+<summary><b>🔎 Lihat Contoh Request & Response</b></summary>
+
+**cURL Request:**
+```bash
 curl --location --request POST '[https://api.sawargipay.com/h2h_activity/v1/saldo](https://api.sawargipay.com/h2h_activity/v1/saldo)' \
 --header 'Api-Key: YOUR_API_KEY'
 
-Response Success:
+Response Success (200):
 {
   "status": true,
   "message": "Saldo berhasil diambil",
@@ -82,17 +45,15 @@ Response Success:
 }
 
 </details>
-2. Daftar Produk
-Mengambil daftar layanan yang tersedia (Pulsa, Paket Data, dll).
- * URL: /h2h_activity/v1/produk
- * Method: POST
-Body Parameters:
-| Parameter | Type | Required | Description |
+2. 📦 Daftar Produk
+Mengambil daftar produk tersedia berdasarkan kategori dan operator.
+ * Endpoint: POST /h2h_activity/v1/produk
+| Parameter Body | Tipe | Wajib | Contoh |
 |---|---|---|---|
-| kategori | string | Yes | Pilihan: "PULSA", "PAKET_DATA" |
-| operator | string | No | Filter operator (e.g., "Telkomsel", "XL") |
+| kategori | string | Ya | "PULSA", "PAKET_DATA" |
+| operator | string | Tidak | "Telkomsel", "XL" |
 <details>
-<summary><b>Lihat Contoh Request & Response</b></summary>
+<summary><b>🔎 Lihat Contoh Request & Response</b></summary>
 cURL Request:
 curl --location '[https://api.sawargipay.com/h2h_activity/v1/produk](https://api.sawargipay.com/h2h_activity/v1/produk)' \
 --header 'Api-Key: YOUR_API_KEY' \
@@ -102,7 +63,7 @@ curl --location '[https://api.sawargipay.com/h2h_activity/v1/produk](https://api
     "operator": "Telkomsel"
 }'
 
-Response Success:
+Response Success (200):
 {
   "status": true,
   "message": "Produk berhasil diambil",
@@ -121,18 +82,16 @@ Response Success:
 }
 
 </details>
-3. Transaksi
-Melakukan pembelian produk (Top Up).
- * URL: /h2h_activity/v1/transaksi
- * Method: POST
-Body Parameters:
-| Parameter | Type | Required | Description |
+3. ⚡ Transaksi (Top Up)
+Melakukan pembelian pulsa atau paket data.
+ * Endpoint: POST /h2h_activity/v1/transaksi
+| Parameter Body | Tipe | Wajib | Deskripsi |
 |---|---|---|---|
-| kategori | string | Yes | "PULSA" atau "PAKET_DATA" |
-| produk_kode | string | Yes | Kode produk (didapat dari endpoint Produk) |
-| tujuan | string | Yes | Nomor HP pelanggan (e.g., "081234567890") |
+| kategori | string | Ya | "PULSA" atau "PAKET_DATA" |
+| produk_kode | string | Ya | Kode produk dari endpoint Produk (misal: TSEL5) |
+| tujuan | string | Ya | Nomor HP pelanggan (misal: 081234567890) |
 <details>
-<summary><b>Lihat Contoh Request & Response</b></summary>
+<summary><b>🔎 Lihat Contoh Request & Response</b></summary>
 cURL Request:
 curl --location '[https://api.sawargipay.com/h2h_activity/v1/transaksi](https://api.sawargipay.com/h2h_activity/v1/transaksi)' \
 --header 'Api-Key: YOUR_API_KEY' \
@@ -143,17 +102,7 @@ curl --location '[https://api.sawargipay.com/h2h_activity/v1/transaksi](https://
     "tujuan": "081234567890"
 }'
 
-Response (Pending/Process):
-{
-  "status": true,
-  "message": "Transaksi sedang diproses",
-  "data": {
-    "trx_kode": "TRX20240203001",
-    "status": "pending"
-  }
-}
-
-Response (Direct Success):
+Response Success (Langsung Sukses):
 {
   "status": true,
   "message": "Transaksi berhasil",
@@ -167,17 +116,25 @@ Response (Direct Success):
   }
 }
 
+Response Pending (Proses):
+{
+  "status": true,
+  "message": "Transaksi sedang diproses",
+  "data": {
+    "trx_kode": "TRX20240203001",
+    "status": "pending"
+  }
+}
+
 </details>
-4. Cek Status
-Mengecek status transaksi real-time menggunakan Kode Transaksi.
- * URL: /h2h_activity/v1/status
- * Method: POST
-Body Parameters:
-| Parameter | Type | Required | Description |
+4. 🔄 Cek Status Transaksi
+Mengecek status terakhir dari transaksi yang telah dilakukan.
+ * Endpoint: POST /h2h_activity/v1/status
+| Parameter Body | Tipe | Wajib | Deskripsi |
 |---|---|---|---|
-| trx_kode | string | Yes | Kode Transaksi unik (e.g., "TRX20240203001") |
+| trx_kode | string | Ya | ID Transaksi yang didapat saat order (misal: TRX2024...) |
 <details>
-<summary><b>Lihat Contoh Request & Response</b></summary>
+<summary><b>🔎 Lihat Contoh Request & Response</b></summary>
 cURL Request:
 curl --location '[https://api.sawargipay.com/h2h_activity/v1/status](https://api.sawargipay.com/h2h_activity/v1/status)' \
 --header 'Api-Key: YOUR_API_KEY' \
@@ -186,7 +143,7 @@ curl --location '[https://api.sawargipay.com/h2h_activity/v1/status](https://api
     "trx_kode": "TRX20240203001"
 }'
 
-Response Success:
+Response Success (200):
 {
   "status": true,
   "message": "Status transaksi berhasil diambil",
@@ -202,13 +159,17 @@ Response Success:
 }
 
 </details>
-Keterangan Status
-| Status | Deskripsi |
-|---|---|
-| pending | Transaksi sedang dalam antrian atau proses provider. |
-| success | Transaksi berhasil, pulsa masuk ke pelanggan. |
-| failed | Transaksi gagal. Saldo otomatis dikembalikan (refund). |
-📞 Support
-Jika Anda mengalami kendala teknis atau masalah integrasi, silakan hubungi tim dukungan kami.
-© 2024 SawargiPay H2H API Integration.
+🛠 Kode Status & Error
+API menggunakan HTTP Status Code standar dan field status di dalam JSON.
+| Status | HTTP Code | Keterangan |
+|---|---|---|
+| success | 200 | Transaksi sukses, SN tersedia. |
+| pending | 200 | Transaksi sedang diproses provider. |
+| failed | 200 | Transaksi gagal, saldo direfund. |
+| error | 401 | Unauthorized: API Key salah/tidak ada. |
+| error | 400 | Bad Request: Parameter input salah. |
+| error | 500 | Server Error: Kesalahan internal server. |
+<p align="center">
+Built with ❤️ by SawargiPay Tech Team
+</p>
 
